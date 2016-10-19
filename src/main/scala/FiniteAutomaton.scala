@@ -5,8 +5,8 @@ case class InvalidFiniteAutomatonException(message: String) extends Exception {
     override def getMessage: String = message
 }
 
-class FiniteAutomaton(states: Set[String], initial: String, finals: Set[String], alphabet: Set[Char],
-                      transitions: Set[(String, Char, String)]) {
+class FiniteAutomaton(states: Set[String], finals: Set[String], alphabet: Set[Char],
+                      transitions: Set[(String, Char, String)], initial: String) {
     //states that have at least one transition to/from
     val tStates = transitions.map{case (s1, _, _) => s1}.union(transitions.map{case (_, _, s2) => s2})
 
