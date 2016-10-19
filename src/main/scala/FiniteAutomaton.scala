@@ -1,3 +1,6 @@
+import uk.co.turingatemyhamster.graphvizs.dsl._
+import uk.co.turingatemyhamster.graphvizs.exec._
+
 case class InvalidFiniteAutomatonException(message: String) extends Exception {
     override def getMessage: String = message
 }
@@ -14,4 +17,16 @@ class FiniteAutomaton(states: Set[String], initial: String, finals: Set[String],
         throw InvalidFiniteAutomatonException("Set of final states contains one or more unknown states")
     else if(states.union(tStates) != states)
         throw InvalidFiniteAutomatonException("Set of transitions contains one or more unknown states")
+
+    //map transitions to a sequence of dot statements
+    var statements: Seq[Statement] = transitions.map{case (s1, c, s2) => s1 --> s2 :| ("label" := c.toString)}.toSeq
+    statements = statements :+ AssignmentStatement("rankdir", "LR")
+    val finiteAutomatonDot = StrictDigraph(
+        "finiteAutomaton",
+        statements: _* //unpack statements into var-arg
+    )
+
+    def getImage(format: DotFormat): String = {
+        dot2dot[Graph, String](finiteAutomatonDot, DotLayout.dot, format)
+    }
 }
