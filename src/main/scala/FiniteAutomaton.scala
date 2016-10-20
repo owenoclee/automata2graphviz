@@ -22,8 +22,10 @@ class FiniteAutomaton(states: Set[String], finals: Set[String], alphabet: Set[Ch
         throw InvalidFiniteAutomatonException("Set of transitions contains a letter not in the alphabet")
 
     //map transitions to a sequence of dot statements
+    var finalNodes: Seq[Statement] = finals.map{s => s :| ("shape" := "circle") :| ("peripheries" := "2")}.toSeq
+    var nonFinalNodes: Seq[Statement] = states.diff(finals).map{s  => s :| ("shape" := "circle")}.toSeq
     var statements: Seq[Statement] = transitions.map{case (s1, c, s2) => s1 --> s2 :| ("label" := c.toString)}.toSeq
-    statements = statements :+ AssignmentStatement("rankdir", "LR")
+    statements = nonFinalNodes ++ finalNodes ++ statements :+ AssignmentStatement("rankdir", "LR")
     val finiteAutomatonDot = StrictDigraph(
         "finiteAutomaton",
         statements: _* //unpack statements into var-arg
